@@ -1,5 +1,5 @@
+This application is made my visualpath.
 # Prerequisites
-#
 - JDK 11 
 - Maven 3 
 - MySQL 8
