@@ -4,7 +4,13 @@ pipeline {
         maven "MAVEN3"
         jdk "OracleJDK11"
     }
-
+    environment{
+        registryCredential = 'ecr:us-east-1:awscreds'
+        appRegistry = "932620631845.dkr.ecr.us-east-1.amazonaws.com/vprofileimg-repo"
+        vprofileRegistry = "http://932620631845.dkr.ecr.us-east-1.amazonaws.com"
+        cluster = "vprofile"
+        service = "vproappsvc"
+    }
     stages {
         // stage('Fetch Code'){
         //     steps{
@@ -14,13 +20,6 @@ pipeline {
         stage('Build'){
             steps{
                 sh 'mvn install -DskipTests'
-            }
-
-            post{
-                success {
-                    echo 'Archiving build artifact'
-                    archiveArtifacts artifacts: '**/*.war'
-                }
             }
         }
         stage('Test'){
@@ -84,6 +83,30 @@ pipeline {
                          type: 'war']
                     ]
                 )
+            }
+        }
+        stage('Build App Imgae'){
+            steps{
+                script{
+                    dockerImage = docker.build(appRegistry + ":$BUILD_NUMBER", "./Docker-file/")
+                }
+            }
+        }
+        stage('Upload App Image'){
+            steps{
+                script{
+                    docker.withRegistry(vprofileRegistry, registryCredential){
+                        dockerImage.push("$BUILD_NUMBER")
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
+        stage('Deploy to ecs'){
+            steps{
+                withAWS(credentials: 'awscreds', region: 'us-east-1'){
+                    sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment'
+                }
             }
         }
     }

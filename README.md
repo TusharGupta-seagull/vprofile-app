@@ -1,6 +1,8 @@
-# End to End CI/CD pipeline implementation using Jenkins
+# End to End CI/CD Pipeline Implementation using Jenkins
 
-In this project we will take the code from git hub, build the code using maven, perform unit test and code analysis using Checkstyle and SonarQube server, and finally store the artifact in the Nexus Repository server.
+In this project we will take the code from GitHub, build the code using maven, perform unit test and code analysis using Checkstyle and SonarQube server, and finally store the artifact in the Nexus Repository server. 
+We will build the dockerImage using the dockerfile and store the image to Amazon ECR repo.
+Deploy the application using Amazon ECS service.
 
 ### Steps
 ---
@@ -30,6 +32,11 @@ In this project we will take the code from git hub, build the code using maven, 
 - Pipeline Maven Integration 
 - BuildTimestamp
 - Pipeline Utility Steps
+- Docker pipeline
+- Cloudbees Docker Build and Publish
+- Amazon ECR
+- Amazon web service SDK
+- Pipeline: AWS steps plugin
 
 #### Install required tools
 - Maven
@@ -44,6 +51,14 @@ In this project we will take the code from git hub, build the code using maven, 
 - Configure sonar server in the Jenkins settings
 - Setup github webhook for the vprofile repository, `http://<jenkins-server-IP>:8080/github-webhook/`
 - Setup webhook for quality gate in sonarqube server, `http://<jenkins-server-privateIP>:8080/sonarqube-webhook`
+- Install Docker engine on Jenkins Instance
+- Add `jenkins` user to `docker` group and reboot
+- Install `awscli` on Jenkins Instance
+
+#### Create IAM user with two policies
+- `AmazonEC2ContainerRegistryFullAccess`
+- `AmazonECS_FullAccess` 
+Then store the aws credentials in jenkins
 
 ---
 
